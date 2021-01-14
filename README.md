@@ -1,5 +1,5 @@
 <h1 align="center">
-:large_orange_diamond: Developing your application with C# using DDD :large_orange_diamond:
+:large_orange_diamond: Design patterns: C# practical approach :large_orange_diamond:
 </h1>
 
 <h2 align="center">
