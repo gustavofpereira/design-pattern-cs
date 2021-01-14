@@ -1,3 +1,21 @@
+<h1 align="center">
+:large_orange_diamond: Developing your application with C# using DDD :large_orange_diamond:
+</h1>
+
+<h2 align="center">
+  Bootcamp Decola Dev Avanade 2021 by <a href=https://digitalinnovation.one/>Digital Innovation One</a>
+</h2>
+
+<p>
+This repository was created as part of bootcamp "Decola Dev <a href=https://www.avanade.com>Avanade</a> 2021" by Digital Innovation One with the objective to learn DDD (Domain-Driven Design) concepts. The task is to rearrange the classroom/project`s folders.
+</p>
+
+## :globe_with_meridians: Source
+  
+
+
+
+
 # DesignPatternSamples
 |Branch|Build|
 |-:|-|
@@ -153,3 +171,7 @@ Temos o exemplo de um segundo Decorator adicionando o recurso de Cache ao nosso 
 Desta forma nós agregamos duas funcionalidades ao nosso serviço sem modificar o comportamento do serviço, ou modificar quem chama o serviço, desta forma estamos aderentes aos princípios **Responsabilidade Única**, **Aberto-Fechado** e **Inversão de Controle**.
 
 <u>Obs.: Seguir o princípio Segregação de Interfaces pode tornar o seu Decorator mais simples de ser implementado, visto que você terá menos métodos para submeter ao padrão.</u>
+
+<p align="right">
+    <a href="https://github.com/gustavofpereira"><img alt="tagcat" src="https://github.com/gustavofpereira/gustavofpereira/blob/main/tagcat.png" width="140"></a>
+</p>
