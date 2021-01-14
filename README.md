@@ -1,1 +1,1 @@
-# design-pattern-cs
+# design-patterns-cs
