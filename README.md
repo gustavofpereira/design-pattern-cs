@@ -7,7 +7,7 @@
 </h2>
 
 <p>
-This repository was created as part of bootcamp "Decola Dev <a href=https://www.avanade.com>Avanade</a> 2021" by Digital Innovation One with the objective to learn DDD (Domain-Driven Design) concepts. The task is to rearrange the classroom/project`s folders.
+This repository was created as part of bootcamp "Decola Dev <a href=https://www.avanade.com>Avanade</a> 2021" by Digital Innovation One. The objective is learn to develop reliable and structured C# applications with the best market practices.
 </p>
 
 ## :globe_with_meridians: Source
