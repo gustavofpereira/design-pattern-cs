@@ -1,126 +1,155 @@
-<h1 align="center">
-:large_orange_diamond: Design Patterns: C# practical approach :large_orange_diamond:
-</h1>
+# DesignPatternSamples
+|Branch|Build|
+|-:|-|
+|Develop|![.NET Core](https://github.com/fructuoso/DesignPatternSamples/workflows/.NET%20Core/badge.svg?branch=develop)|
+|Main|![.NET Core](https://github.com/fructuoso/DesignPatternSamples/workflows/.NET%20Core/badge.svg?branch=main)|
 
-<h2 align="center">
-  Bootcamp Decola Dev Avanade 2021 by <a href=https://digitalinnovation.one/>Digital Innovation One</a>
-</h2>
+Aplicação de exemplo de aplicação de Design Patterns na prática em um projeto WebAPI .NET Core 3.1 utilizada na palestra "Aplicando design patterns na prática com C#" ([Link Apresentação](Apresenta%C3%A7%C3%A3o/Aplicando%20design%20patterns%20na%20pr%C3%A1tica%20com%20C%23.pdf))
 
-<p>
-This repository was created as part of bootcamp "Decola Dev <a href=https://www.avanade.com>Avanade</a> 2021" by Digital Innovation One. The objective is learn to develop reliable and structured C# applications with the best market practices.
-</p>
+## Testes de Cobertura
 
-## :globe_with_meridians: Source
-  
+Passo a passo sobre como executar os testes unitários (e calcular o code coverage) localmente antes de realizar o commit.
 
+<u>Obs.: O VS2019 possui esta funcionalidade nativamente, porém ela só está habilitada para a versão Enterprise segundo a [documentação](https://docs.microsoft.com/pt-br/visualstudio/test/using-code-coverage-to-determine-how-much-code-is-being-tested?view=vs-2019) da própria Microsoft.</u>
 
-![Aurora Project](https://repository-images.githubusercontent.com/128673011/f6ebdd80-b6da-11ea-94bb-9d141944b257)
+### Pré-Requisitos
 
-# What is Aurora project?
-It's an open source project, written in .NET Core, currently in version 3.1.
+Para gerar o relatório é necessário instalar o **dotnet-reportgenerator-globaltool**
 
-The project's goals is to show that is possible to create an architecture more simple than others and using some concepts like DDD (Design Driven Design).
+```script
+dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.6.1
+````
 
-## Business proposal:
-This project is a simple PPE (Personal Protective Equipament) Management. The principle idea is to register workers and PPE and, with this data, allow to transfer PPE to a worker.
-Besides that, this system allow that you see all PPE and who has a PPE and notify if the PPE is near to expire.
+### Execução
 
-### Abbreviations:
-* NIN: National Insurance Number (as CPF in Brazil)
+Executar o **.bat** para realizar a execução dos testes automatizados com a extração do relatório de cobertura na sequência.
 
-## How to use:
-1. Clone this project to into your machine
-2. Use the default connection string or:
-    2.1. Install and configure [MySql](https://dev.mysql.com/downloads/mysql/), if you want.
-    2.2. Inform the connection string on Aroura.Infra.Data/Context/MySqlContext.cs, if necessary
-    * Put the server name on [SERVER] tag
-    * Put the port number on [PORT] tag
-    * Put the user name database on [USER] tag
-    * Put the password database on [PASSWORD] tag
-4. Finally, build and run the application
+```bat
+$ test-coverage.bat
+```
 
-## MySql Migrations:
-1. Open your Package Manager Console
-2. Change the default project to Aurora.Infra.Data
-3. Run command "Add-Migration [NAME OF YOUR MIGRATION]"
-4. Run command "Update-Database"
+## Padrões na Prática
 
-For more information about this project, sse this [article](https://medium.com/@alexalves_85598/criando-uma-api-em-net-core-baseado-na-arquitetura-ddd-2c6a409c686).
+### Strategy
 
-## Technologies implemented:
-* ASP.NET Core 3.1 (com .NET Core 3.1)
-* Entity Framework Core 3.1.5
-* Flunt Validation 1.0.5
-* Swagger UI 5.5.0
-* MySql Database Connection
-* .NET Core Native DI
-* SpecFlow for BDD
-* GitHub Actions
+#### Problema:
 
-## Architecture:
-* Layer architecture
-* S.O.L.I.D. principles
-* Clean Code
-* Domain Validations
-* Domain Notifications
-* Domain Driven Design
-* Repository Pattern
-* Notification Pattern
-* Mapper by Extension Methods
-* Value Types
-* BDD (Behavior Driven Development)
+Nosso objetivo é Utilizar o método Distinct do System.Linq, este por sua vez espera como entrada uma IEqualityComparer. Isso por si só já representa uma implementação de Strategy, entretanto nós não queremos criar uma única implementação engessada que nos permita comparar um determinado objeto de uma única forma.
 
-![Architecture](https://miro.medium.com/max/962/1*qpHCIA7RDfW89KtSUXGJog.png)
+##### Solução:
 
-## News:
-**v1.4 --- 2020-09-28**
-* CI/CD by GitHub Actions
-* Include integration tests using BDD with SpecFlow
-    * scenario of register a worker
-    * scenario of update a worker
-* Bug corrections
+1. Criar uma classe que implemente a interface [IEqualityComparer](https://docs.microsoft.com/pt-br/dotnet/api/system.collections.generic.iequalitycomparer-1?view=netcore-3.1);
+2. Esta classe deve receber o 'como' os objetos deverão ser comparados através de um parâmetro, que neste caso é uma função anônima;
 
-**v1.3 --- 2020-07-30**
-* Changed some Primitive Types to Value Types
-* Changed the business idea principle
+Desta forma a classe que criamos sabe comparar objetos, porém ela não sabe os critérios que serão utilizados, os critérios serão injetados através de uma função anônima.
 
-**v1.2 --- 2020-06-30**
-* Implemented Notification Pattern
-* Implemented Domain Validations and Notifications
-* Using some concepts of Clean Architecture
-    * Entities
-    * Interface Adapters
-* Changed the framework validations to Flunt
-* Using mapper by extension methods
+[Implementação](src/Workbench.Comparer/GenericComparerFactory.cs)\
+[Consumo](src/Workbench.GenericComparer.Tests/GenericComparerFactoryTest.cs#L27)
 
-**v1.1 --- 2020-06-24**
-* Updated the project name
-* Updated the project's SDK to .NET Core 3.1 version
-* Added the Swagger framework to document the API
-* Corrections to end-points
-* Published in [Azure](http://aurora-project.azurewebsites.net/swagger/index.html)
+Podemos tornar o consumo ainda mais interessante criando uma *Sugar Syntax* através de métodos de extensão.
 
-**v1.0 --- 2018-06-09**
-* Create the project in .NET Core 2.0 version
-* Structured the project on layer architecture 
-* Used the Service layer to business rules
-* Used the FluentValidation library
-* Configured the connection to MySql database
-* Used EntityFramework
+[Implementação](src/Workbench.Linq.Extensions/DistinctExtensions.cs)\
+[Consumo](src/Workbench.Linq.Extensions.Tests/DistinctExtensionsTests.cs#L26)
 
-## Why Aurora?
-The name Aurora came from the natural event called Aurora Borealis. It is a scientific event described by the interaction between the earth's magnetic layer and energized particles from the solar wind.
+Desta forma através do padrão [Strategy](#strategy) estamos aderentes ao princípio **Aberto-Fechado** e **Inversão de Controle**.
 
-A curiosity about such an event is that what we see in photographs is not always the same image that is seen live.
+### Factory
 
-For more information, look this [link](https://www.hipercultura.com/fenomenos-naturais/).
+#### Problema: 
 
-## We're online!
-See the project in [Azure](http://aurora-project.azurewebsites.net/swagger/index.html).
+Nós queremos criar um serviço de consulta de débitos do veículo que seja capaz de acessar o sistema do DETRAN e obter estas informações, porém o DETRAN possui uma aplicação completamente diferente de acordo com o estado.
 
-## About:
-The Aurora project was developed by [Alex Alves](https://www.linkedin.com/in/alexalvess/).
+Nós não queremos modificar o nosso serviço sempre que um novo estado for implementado.
 
-<p align="right">
-    <a href="https://github.com/gustavofpereira"><img alt="tagcat" src="https://github.com/gustavofpereira/gustavofpereira/blob/main/tagcat.png" width="140"></a>
-</p>
+#### Solução:
+
+1. Criar uma interface que determine uma assinatura única para o serviço;
+2. Realizar uma implementação para cada um dos estados;
+3. Criar uma classe Factory, onde sua responsabilidade será determinar qual classe concreta deverá ser instanciada;
+
+[Implementação](src/Infra.Repository.Detran/DetranVerificadorDebitosFactory.cs)\
+[Consumo](src/Application/Implementations/DetranVerificadorDebitosServices.cs#L20)\
+[Teste](src/Infra.Repository.Detran.Tests/DetranVerificadorDebitosFactoryTests.cs#L22)
+
+Desta forma através do padrão [Factory](#factory) estamos aderentes ao princípio **Aberto-Fechado**.
+
+Neste exemplo o nosso [Factory](#factory) ainda está diretamente relacionado ao princípio **Substituição de Liskov**.
+
+### Singleton
+
+#### Problema:
+
+Visto que o nosso Factory tem como responsabilidade apenas identificar a classe concreta que teve ser inicializada a partir de um Setup pré-estabelecido no [Startup](src/WebAPI/Startup.cs#L130) da aplicação, não faz sentido que ele seja instanciado a cada solicitação.
+
+#### Solução:
+
+Como estamos fazendo uso da Injeção de Dependência nativa do .Net Core processo se torna mais simples:
+
+1. Modificar o registro no Startup para que o serviço seja registrado como Singleton.
+
+[Implementação](src/WebAPI/Startup.cs#L111)
+
+Com isso nós temos uma única instância sendo inicializada e configurada no [Startup](src/WebAPI/Startup.cs#L130) da aplicação.
+
+### Template Method
+
+#### Problema:
+
+Visto que em algum momento iremos implementar 27 serviços diferentes para acessar os DETRAN que temos espalhados pelo Brasil.
+
+Entendemos que, mesmo que, os sites sejam diferentes, os passos necessários para extrair a informação costumam ser semelhantes:
+
+* Consultar Site
+* Consolidar Resultado
+
+Como a nossa interface [IDetranVerificadorDebitosRepository](src/Application/Repository/IDetranVerificadorDebitosRepository.cs) possui apenas o método ConsultarDebitos, nosso código corre risco de não ficar padronizado e ainda perdermos o princípio da **Responsabilidade Única**.
+
+#### Solução:
+
+1. Criar uma classe abstrata com métodos mais específicos para realizar o trabalho desejado;
+2. A classe abstrata 'deve' implementar o método exposto pela Interface;
+3. Ao invés das classes implementarem a Interface, elas herdarão o comportamento da classe abstrata, implementando apenas os métodos mais específicos.
+
+Com isso torna-se mais fácil:
+* Dividir o trabalho;
+* Testar o código.
+
+[Implementação](src/Infra.Repository.Detran/DetranVerificadorDebitosRepositoryCrawlerBase.cs)\
+[Consumo](src/Infra.repository.detran/DetranPEVerificadorDebitosRepository.cs)
+
+O neste exemplo o nosso [Template Method](#template-method) ainda seguindo o princípio **Segregação da Interface**, onde os métodos específicos foram adicionados na nossa classe abstrata [DetranVerificadorDebitosRepositoryCrawlerBase](src/Repository.Detran/../Infra.Repository.Detran/DetranVerificadorDebitosRepositoryCrawlerBase.cs), desta forma conseguimos atingir também o princípio de **Substituição de Liskov**.
+
+### Decorator
+
+#### Problema: 
+
+Com o serviço [DetranVerificadorDebitosServices](src/Application/Implementations/DetranVerificadorDebitosServices.cs) identificamos que precisamos adicionar funcionalidades técnicas a ele (como por exemplo **Log** e **Cache**), porém essas funcionalidades não devem gerar acoplamento no nosso código.
+
+Então como fazer isso sem quebrar os princípios **Responsabilidade Única** e **Aberto-Fechado**?
+
+#### Solução:
+
+Neste cenário estamos usando uma abordagem que nos permite transferir a complexidade de registrar um Decorator no ServiceCollection para um método de extensão.
+
+Desta forma precisamos:
+
+1. Criar uma nova classe concreta que deverá implementar a Interface que será 'decorada';
+2. Implementar nesta nova classe a funcionalidade que gostaríamos de acrescentar ao método em questão;
+3. Adicionar Decorator no Injetor de Dependências fazendo referência à interface que será decorada.
+
+Obs.: É possível incluir mais de um Decorator, porém é preciso ter ciência de que a ordem em que eles são associados faz diferença no resultado final.
+
+[Método de Extensão](src/Workbench.DependencyInjection.Extensions/ServiceCollectionExtensions.cs#L10)\
+[Implementação](src/Application/Decorators/DetranVerificadorDebitosDecoratorLogger.cs#L23)\
+[Registro](src/WebAPI/Startup.cs#L110)
+
+O Decorator funciona como uma 'Boneca Russa' dessa forma podemos 'empilhar' diversos Decorators em uma mesma Interface.
+
+Temos o exemplo de um segundo Decorator adicionando o recurso de Cache ao nosso Service.
+
+[Implementação](src/Application/Decorators/DetranVerificadorDebitosDecoratorCache.cs#L25)\
+[Registro](src/WebAPI/Startup.cs#L09)
+
+Desta forma nós agregamos duas funcionalidades ao nosso serviço sem modificar o comportamento do serviço, ou modificar quem chama o serviço, desta forma estamos aderentes aos princípios **Responsabilidade Única**, **Aberto-Fechado** e **Inversão de Controle**.
+
+<u>Obs.: Seguir o princípio Segregação de Interfaces pode tornar o seu Decorator mais simples de ser implementado, visto que você terá menos métodos para submeter ao padrão.</u>
